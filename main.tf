@@ -1,6 +1,21 @@
+resource "aws_security_group" "test_server_sg" {
+  name_prefix = "test-server-sg"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Restrict this for better security
+  }
+}
+
 resource "aws_instance" "test_server" {
   ami           = "ami-0b74f796d330ab49c"
   instance_type = "t2.micro"
+  key_name      = "testkey"
+  vpc_security_group_ids = [aws_security_group.test_server_sg.id]
+
+  user_data = file("setup.sh")
 
   tags = {
     Name = "ExampleWebAppServer"
